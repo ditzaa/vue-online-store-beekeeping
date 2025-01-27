@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const express = require("express");
 const morgan = require("morgan");
+const router = require("./routes");
 
 // load .env variables
 dotenv.config();
@@ -15,9 +16,8 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 
-// routes
-app.use("/", (req, res) => res.send("Hello, world!"));
-//app.use("/", require("./rotues/productRoutes"));
+// use roter
+app.use("/api", router);
 
 // error handling
 app.use((err, req, res, next) => {
