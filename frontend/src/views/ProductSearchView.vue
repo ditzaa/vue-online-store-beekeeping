@@ -4,5 +4,5 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
 
 <template>
   <HeaderComponent />
-  <h1>Aici ar trebui sa avem o descriere interesanta pt a atrage clienti</h1>
+  <h4>Doar un template, aici ar trebui ca produsele sa fie cautate in functie de un keyword</h4>
 </template>

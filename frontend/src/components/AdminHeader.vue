@@ -4,19 +4,13 @@ import { Heart, Search, ShoppingCart, User } from "lucide-vue-next";
 
 <template>
   <header class="header-container">
-    <div class="icons">
-      <ShoppingCart class="icon" :size="32" />
-      <Heart class="icon" id="heart-icon" :size="32" />
-      <User class="icon" fill="var(--text-color)" :size="32" />
-    </div>
     <h1 class="title">The Bee's Store 🐝</h1>
 
     <nav>
       <ul class="links-list">
-        <li><RouterLink class="links" to="/">Acasă</RouterLink></li>
-        <li><RouterLink class="links" to="/produse/miere">Miere</RouterLink></li>
-        <li><RouterLink class="links" to="/produse/altele">Altele</RouterLink></li>
-        <li><RouterLink class="links" to="/despre-noi">Despre noi</RouterLink></li>
+        <li><RouterLink class="links" to="/admin/comenzi">Comenzi</RouterLink></li>
+        <li><RouterLink class="links" to="/produse/miere">Produse</RouterLink></li>
+        <li><RouterLink class="links" to="/produse/altele">Statistici</RouterLink></li>
       </ul>
     </nav>
     <div class="search-bar">

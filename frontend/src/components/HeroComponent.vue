@@ -1,16 +1,4 @@
-<script>
-// import { Heart, Search, ShoppingCart, User } from "lucide-vue-next";
-
-export default {
-  name: "HeroComponent",
-  components: {
-    // Heart,
-    // Search,
-    // ShoppingCart,
-    // User,
-  },
-};
-</script>
+<script setup></script>
 
 <template>
   <section>

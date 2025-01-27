@@ -1,28 +1,26 @@
-<script>
-import { Heart, Type } from "lucide-vue-next";
+<script setup>
+import { Heart } from "lucide-vue-next";
+import { useProductStore } from "@/stores/productStore";
 
-export default {
-  name: "ProductCard",
-  components: {
-    Heart,
+const props = defineProps({
+  product: {
+    type: Object,
+    required: true,
   },
-  props: {
-    product: {
-      type: Object,
-      required: true,
-    },
-  },
-  methods: {
-    goToProductDetails() {
-      this.$router.push("/product/${this.product.id}");
-    },
-    addToFavorites() {
-      console.log(`Produsul ${this.product.name} a fost adăugat la favorite!`);
-    },
-    addToCart() {
-      console.log(`Produsul ${this.product.name} a fost adăugat în coș!`);
-    },
-  },
+});
+
+const productStore = useProductStore();
+
+const goToProductDetails = () => {
+  router.push(`/product/${props.product.id}`);
+};
+
+const addToFavorites = () => {
+  productStore.addToFavorites(props.product);
+};
+
+const addToCart = () => {
+  productStore.addToCart(props.product);
 };
 </script>
 
@@ -116,7 +114,6 @@ export default {
 @media (min-width: 768px) and (max-width: 1200px) {
   .product-card {
     padding: 12px;
-    max-width: 25%;
   }
 
   .product-name {

@@ -1,19 +1,12 @@
-<script>
+<script setup>
+// import { useProductStore } from "@/stores/productStore";
 import ProductCard from "@/components/ProductCard.vue";
 
-export default {
-  name: "HomeProducts",
-  components: { ProductCard },
-  data() {
-    return {
-      productPlaceholder: {
-        id: 1,
-        name: "Miere polifloră premium",
-        image: "https://source.unsplash.com/random/?honey,bees",
-        price: 25.99,
-      },
-    };
-  },
+const productPlaceholder = {
+  id: 1,
+  name: "Miere polifloră premium",
+  image: "https://source.unsplash.com/random/?honey,bees",
+  price: 25.99,
 };
 </script>
 
@@ -36,7 +29,6 @@ section {
 
 @media (min-width: 768px) and (max-width: 1200px) {
   section {
-    display: flex;
     flex-wrap: wrap;
   }
 }
