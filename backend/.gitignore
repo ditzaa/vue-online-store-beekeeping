@@ -1,3 +1,4 @@
 node_modules/
 .env
+/utils/jwt.js
 /utils/serviceAccountKey.json
