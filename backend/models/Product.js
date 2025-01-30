@@ -1,9 +1,4 @@
-class ProductModel {
-  constructor(id, name, price) {
-    this.id = id;
-    this.name = name;
-    this.price = price;
-  }
-}
+const db = require("../config/db");
+const products = db.collection("products");
 
-module.exports = ProductModel;
+module.exports = products;
