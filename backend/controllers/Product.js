@@ -11,11 +11,10 @@ controller = {
         return;
       }
       snapshot.forEach((doc) => {
-        productsArray.push({
-          id: doc.id,
-          name: doc.data().name,
-          price: doc.data().name,
-        });
+        productsArray.push(doc.data());
+        if (doc.id == "mainProductsDoc" || doc.id == "productIdIndex") {
+          productsArray.pop();
+        }
       });
       res.send(productsArray);
     } catch (error) {
@@ -64,27 +63,6 @@ controller = {
       res.status(500).send(error.message);
     }
   },
-  getAllProducts: async (req, res) => {
-    try {
-      const { name, price, description, stock, image, isHoney } = req.body;
-      const snapshot = await products.get();
-      const productsArray = [];
-      if (snapshot.empty) {
-        console.log("No matching documents.");
-        return;
-      }
-      snapshot.forEach((doc) => {
-        productsArray.push({
-          id: doc.id,
-          name: doc.data().name,
-          price: doc.data().name,
-        });
-      });
-      res.send(productsArray);
-    } catch (error) {
-      res.status(400).send(error.message);
-    }
-  },
   getProductById: async (req, res) => {
     try {
       const productId = req.params.id;
@@ -96,6 +74,68 @@ controller = {
 
       const productData = productDoc.data();
       res.status(200).send(productData);
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+  },
+  getMainProducts: async (req, res) => {
+    try {
+      const productsDoc = await products.doc("mainProductsDoc").get();
+
+      if (!productsDoc.exists) {
+        return res
+          .status(404)
+          .send({ message: "Main Products Document not found" });
+      }
+
+      const { mainProducts } = productsDoc.data();
+
+      if (!mainProducts || mainProducts.length === 0) {
+        return res.status(404).send({ message: "No main products found" });
+      }
+
+      const productPromises = mainProducts.map(async (id) => {
+        const productDoc = await products.doc(id.toString()).get();
+        if (!productDoc.exists) return null;
+
+        const productData = productDoc.data();
+        return {
+          id: id,
+          image: productData.image,
+          name: productData.name,
+          price: productData.price,
+        };
+      });
+
+      const mainProductsDetails = (await Promise.all(productPromises)).filter(
+        Boolean
+      );
+
+      res.status(200).send({
+        message: "Main products sent succesfuly",
+        mainProductsDetails,
+      });
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+  },
+  searchProducts: async (req, res) => {
+    try {
+      const { query } = req.query;
+      const snapshot = await products.get();
+      const productsArray = [];
+
+      snapshot.forEach((doc) => {
+        const product = doc.data();
+        console.log(product.name);
+        if (doc.id !== "mainProductsDoc" && doc.id !== "productIdIndex") {
+          if (product.name.toLowerCase().includes(query.toLowerCase())) {
+            productsArray.push(product);
+          }
+        }
+      });
+
+      res.status(200).send(productsArray);
     } catch (error) {
       res.status(400).send(error.message);
     }

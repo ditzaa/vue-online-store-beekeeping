@@ -1,8 +1,8 @@
 const db = require("../config/db");
 const users = db.collection("users");
 const bcrypt = require("bcrypt");
-require("dotenv").config();
 const generateToken = require("../utils/jwt");
+require("dotenv").config();
 
 controller = {
   register: async (req, res) => {
@@ -49,6 +49,7 @@ controller = {
         county: county,
         id: currentUserId,
         role: "client",
+        favoriteProducts: [],
       };
 
       const newDocument = await users

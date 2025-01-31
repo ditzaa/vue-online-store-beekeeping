@@ -1,6 +1,10 @@
 <script setup>
 import { Heart } from "lucide-vue-next";
-import { useProductStore } from "@/stores/productStore";
+import { useRouter } from "vue-router";
+
+// import { useProductStore } from "@/stores/productStore";
+// const productStore = useProductStore();
+const router = useRouter();
 
 const props = defineProps({
   product: {
@@ -8,8 +12,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const productStore = useProductStore();
 
 const goToProductDetails = () => {
   router.push(`/product/${props.product.id}`);
@@ -25,9 +27,9 @@ const addToCart = () => {
 </script>
 
 <template>
-  <div class="product-card">
-    <!-- <img :src="product.image" :alt="product.name" class="product-image" /> -->
-    <img src="../assets/borcan-miere-poliflora.jpg" alt="product.name" class="product-image" />
+  <div class="product-card" @click="goToProductDetails">
+    <img :src="product.image" :alt="product.name" class="product-image" />
+    <!-- <img src="../assets/borcan-miere-poliflora.jpg" alt="product.name" class="product-image" /> -->
     <h3 class="product-name">{{ product.name }}</h3>
     <p class="product-price">{{ product.price }} Lei</p>
     <div class="product-buttons">
@@ -42,11 +44,14 @@ const addToCart = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   background-color: var(--product-card-bg);
   border: 2px solid var(--secondary-color);
   border-radius: 20px;
   padding: 16px;
   cursor: pointer;
+  /* max-width: 280px; */
+  width: 250px;
 }
 
 .product-card:hover {

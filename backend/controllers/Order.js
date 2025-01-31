@@ -82,6 +82,9 @@ controller = {
           status: doc.data().status,
           totalPrice: doc.data().totalPrice,
         });
+        if (doc.id == "orderIdIndex") {
+          ordersArray.pop();
+        }
       });
       res.send(ordersArray);
     } catch (error) {

@@ -1,5 +1,22 @@
 <script setup>
 import { Heart, Search, ShoppingCart, User } from "lucide-vue-next";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const searchQuery = ref("");
+
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({ path: "/produse", query: { query: searchQuery.value } });
+  }
+};
+
+const handleKeyPress = (event) => {
+  if (event.key == "Enter") {
+    handleSearch();
+  }
+};
 </script>
 
 <template>
@@ -19,9 +36,15 @@ import { Heart, Search, ShoppingCart, User } from "lucide-vue-next";
         <li><RouterLink class="links" to="/despre-noi">Despre noi</RouterLink></li>
       </ul>
     </nav>
-    <div class="search-bar">
+    <div class="search-bar" @click="handleSearch">
       <Search class="icon" :size="32" />
-      <input type="text" placeholder="Caută produse..." class="search-input" />
+      <input
+        type="text"
+        placeholder="Caută produse..."
+        class="search-input"
+        v-model="searchQuery"
+        @keypress="handleKeyPress"
+      />
     </div>
   </header>
 </template>

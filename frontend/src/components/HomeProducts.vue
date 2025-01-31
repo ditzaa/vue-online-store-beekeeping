@@ -1,21 +1,34 @@
 <script setup>
-// import { useProductStore } from "@/stores/productStore";
+import { ref, onMounted } from "vue";
 import ProductCard from "@/components/ProductCard.vue";
 
-const productPlaceholder = {
-  id: 1,
-  name: "Miere polifloră premium",
-  image: "https://source.unsplash.com/random/?honey,bees",
-  price: 25.99,
+const mainProducts = ref([]);
+
+const fetchMainProducts = async () => {
+  try {
+    const response = await fetch(
+      `http://${import.meta.env.VITE_DOMAIN_NAME}:${
+        import.meta.env.VITE_PORT_BACK_END
+      }/api/product/getMainProducts`
+    );
+    const data = await response.json();
+
+    if (data.mainProductsDetails) {
+      mainProducts.value = data.mainProductsDetails;
+    }
+
+    console.log("Fetched products:", mainProducts.value);
+  } catch (error) {
+    console.error("Error fetching main products:", error);
+  }
 };
+
+onMounted(fetchMainProducts);
 </script>
 
 <template>
   <section>
-    <ProductCard :product="productPlaceholder" />
-    <ProductCard :product="productPlaceholder" />
-    <ProductCard :product="productPlaceholder" />
-    <ProductCard :product="productPlaceholder" />
+    <ProductCard v-for="product in mainProducts" :key="product.id" :product="product" />
   </section>
 </template>
 

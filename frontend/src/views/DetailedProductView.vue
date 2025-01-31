@@ -1,13 +1,14 @@
 <script setup>
 import { Heart } from "lucide-vue-next";
-import { useProductStore } from "@/stores/productStore";
+import { ref, onMounted } from "vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
+import ProductCard from "@/components/ProductCard.vue";
+// import { useProductStore } from "@/stores/productStore";
 
-const productStore = useProductStore();
+// const productStore = useProductStore();
 
 const productDetails = {
   id: 99,
-  //   id: route.params.id,
   name: "Miere polifloră premium",
   image: "https://source.unsplash.com/random/400x400/?honey,bees",
   price: 25.99,

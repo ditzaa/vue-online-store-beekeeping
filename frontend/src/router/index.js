@@ -18,14 +18,14 @@ const router = createRouter({
       component: () => import("../views/AboutView.vue"),
     },
     {
-      path: "/produse/miere",
+      path: "/produse/:category",
       name: "honey-products",
-      component: () => import("../views/ProductSearchView.vue"),
+      component: () => import("../views/CategoriesView.vue"),
     },
     {
       path: "/produse/altele",
       name: "other-products",
-      component: () => import("../views/ProductSearchView.vue"),
+      component: () => import("../views/CategoriesView.vue"),
     },
     {
       path: "/produs",
@@ -56,6 +56,16 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: () => import("../views/Login.vue"),
+    },
+    {
+      path: "/product/:id",
+      name: "ProductDetails",
+      component: () => import("../views/ProductDetails.vue"),
+    },
+    {
+      path: "/produse",
+      name: "ProductSearch",
+      component: () => import("../views/ProductSearchView.vue"),
     },
   ],
 });
