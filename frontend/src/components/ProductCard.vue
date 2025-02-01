@@ -1,10 +1,24 @@
 <script setup>
 import { Heart } from "lucide-vue-next";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import { computed } from "vue";
 
 // import { useProductStore } from "@/stores/productStore";
 // const productStore = useProductStore();
 const router = useRouter();
+const authStore = useAuthStore();
+
+const isFavorite = computed(() => {
+  return authStore.user?.favoriteProducts?.includes(props.product.id);
+});
+
+const toggleFavorite = () => {
+  if (!authStore.isAuthenticated) {
+    router.push("/login");
+    return;
+  }
+};
 
 const props = defineProps({
   product: {
@@ -17,23 +31,39 @@ const goToProductDetails = () => {
   router.push(`/product/${props.product.id}`);
 };
 
-const addToFavorites = () => {
-  productStore.addToFavorites(props.product);
-};
+// const addToFavorites = () => {
+//   productStore.addToFavorites(props.product);
+// };
 
-const addToCart = () => {
-  productStore.addToCart(props.product);
-};
+// const addToCart = () => {
+//   productStore.addToCart(props.product);
+// };
 </script>
 
-<template>
+<!-- <template>
   <div class="product-card" @click="goToProductDetails">
     <img :src="product.image" :alt="product.name" class="product-image" />
-    <!-- <img src="../assets/borcan-miere-poliflora.jpg" alt="product.name" class="product-image" /> -->
+    <img src="../assets/borcan-miere-poliflora.jpg" alt="product.name" class="product-image" />
     <h3 class="product-name">{{ product.name }}</h3>
     <p class="product-price">{{ product.price }} Lei</p>
     <div class="product-buttons">
       <Heart @click.stop="addToFavorites" class="favorite-button" />
+      <button @click.stop="addToCart" class="add-cart-button">🛒 Adaugă în coș</button>
+    </div>
+  </div>
+</template> -->
+
+<template>
+  <div class="product-card">
+    <img :src="product.image" :alt="product.name" class="product-image" />
+    <h3 class="product-name">{{ product.name }}</h3>
+    <p class="product-price">{{ product.price }} Lei</p>
+    <div class="product-buttons">
+      <Heart
+        @click.stop="toggleFavorite"
+        class="favorite-button"
+        :fill="isFavorite ? 'red' : 'none'"
+      />
       <button @click.stop="addToCart" class="add-cart-button">🛒 Adaugă în coș</button>
     </div>
   </div>

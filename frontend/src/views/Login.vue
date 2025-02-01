@@ -1,18 +1,24 @@
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import HeaderComponent from "@/components/HeaderComponent.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 const email = ref("");
 const password = ref("");
+const authStore = useAuthStore();
+const router = useRouter();
 
-const handleLogin = () => {
-  // Adaugă logica pentru autentificare
-  console.log("Email:", email.value, "Password:", password.value);
+const handleLogin = async () => {
+  await authStore.login(email.value, password.value);
+  if (authStore.isAuthenticated) {
+    router.push("/");
+  }
 };
 </script>
 
 <template>
-  <AdminHeader></AdminHeader>
+  <HeaderComponent />
   <section class="login-view">
     <h1>Autentificare</h1>
     <form @submit.prevent="handleLogin">
@@ -61,7 +67,6 @@ button {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  /* border-radius: 5px; */
   cursor: pointer;
 }
 

@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const users = db.collection("users");
+const products = db.collection("products");
 const bcrypt = require("bcrypt");
 const generateToken = require("../utils/jwt");
 require("dotenv").config();
@@ -92,7 +93,9 @@ controller = {
         return res.status(401).send({ message: "Invalid password" });
       }
       const token = generateToken(user.id, user.role);
-      res.status(200).send({ message: "User logged in succesfuly", token });
+      res
+        .status(200)
+        .send({ message: "User logged in succesfuly", token, user });
     } catch (error) {
       res.status(500).send({ message: error.message });
     }
@@ -177,6 +180,24 @@ controller = {
 
       const token = generateToken(user.id, user.role);
       res.status(200).send({ message: "Admin logged in succesfuly", token });
+    } catch (error) {
+      res.status(500).send({ message: error.message });
+    }
+  },
+  getFavorites: async (req, res) => async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const userDoc = await users.doc(userId).get();
+      const user = userDoc.data();
+
+      const favoriteProducts = await Promise.all(
+        user.favoriteProducts.map(async (productId) => {
+          const productDoc = await products.doc(productId).get();
+          return productDoc.data();
+        })
+      );
+
+      res.send(favoriteProducts);
     } catch (error) {
       res.status(500).send({ message: error.message });
     }
