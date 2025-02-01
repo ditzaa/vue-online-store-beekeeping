@@ -70,6 +70,7 @@ export const useAuthStore = defineStore("auth", {
         this.user = JSON.parse(JSON.stringify(data.user));
         console.log("User after validation:", this.user);
         localStorage.setItem("token", data.token);
+        localStorage.setItem("username", this.user.name);
       } catch (error) {
         console.error("Eroare la autentificare:", error.message);
       }
@@ -78,6 +79,7 @@ export const useAuthStore = defineStore("auth", {
       this.token = null;
       this.user = null;
       localStorage.removeItem("token");
+      localStorage.removeItem("username");
     },
   },
 });

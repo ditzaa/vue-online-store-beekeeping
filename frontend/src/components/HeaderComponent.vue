@@ -8,6 +8,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const searchQuery = ref("");
 const showLoginModal = ref(false);
+const username = localStorage.getItem("username");
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
@@ -63,49 +64,10 @@ const goToFavorites = () => {
       />
     </div>
   </header>
-
-  <!-- <template>
-  <header class="header-container">
-    <div class="icons">
-      <ShoppingCart class="icon" :size="32" />
-      <Heart class="icon" id="heart-icon" :size="32" @click="goToFavorites" />
-      <User class="icon" fill="var(--text-color)" :size="32" />
-      <User
-        v-if="!authStore.isAuthenticated"
-        class="icon"
-        fill="var(--text-color)"
-        :size="32"
-        @click="showLoginModal = true"
-      />
-      <button v-else class="logout-button" @click="handleLogout">Logout</button>
-    </div>
-    <h1 class="title">The Bee's Store 🐝</h1>
-
-    <nav>
-      <ul class="links-list">
-        <li><RouterLink class="links" to="/">Acasă</RouterLink></li>
-        <li><RouterLink class="links" to="/produse/miere">Miere</RouterLink></li>
-        <li><RouterLink class="links" to="/produse/altele">Altele</RouterLink></li>
-        <li><RouterLink class="links" to="/despre-noi">Despre noi</RouterLink></li>
-      </ul>
-    </nav>
-    <div class="search-bar" @click="handleSearch">
-      <Search class="icon" :size="32" />
-      <input
-        type="text"
-        placeholder="Caută produse..."
-        class="search-input"
-        v-model="searchQuery"
-        @keypress="handleKeyPress"
-      />
-    </div>
-  </header>
-</template> -->
-
-  <!-- MODAL LOGIN -->
+  <!-- Modal -->
   <div v-if="showLoginModal" class="modal-overlay" @click.self="showLoginModal = false">
     <div class="modal-content">
-      <h2 v-if="authStore.isAuthenticated">Salut, {{ authStore.user?.name }}!</h2>
+      <h2 v-if="authStore.isAuthenticated">Salut, {{ username }}!</h2>
       <div v-else>
         <button class="modal-button" @click="$router.push('/login')">Autentificare</button>
         <button class="modal-button" @click="$router.push('/register')">Înregistrare</button>

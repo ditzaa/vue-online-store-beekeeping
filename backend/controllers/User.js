@@ -58,13 +58,9 @@ controller = {
         .set(newUser);
       await userIdDoc.update({ userId: currentUserId + 1 });
 
-      //generate jwt token
-      const token = generateToken(newUser.id);
-
       res.status(201).send({
         message: "User registered successfully",
         newUser: newDocument,
-        token,
       });
     } catch (error) {
       res.status(500).send(error.message);
@@ -143,13 +139,9 @@ controller = {
         .set(newAdmin);
       await userIdDoc.update({ userId: currentUserId + 1 });
 
-      //generate jwt token
-      const token = generateToken(newAdmin.id);
-
       res.status(201).send({
         message: "Admin registered successfully",
         newAdmin: newAdmin,
-        token,
       });
     } catch (error) {
       res.status(500).send(error.message);
