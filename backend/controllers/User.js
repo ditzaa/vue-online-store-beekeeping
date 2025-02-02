@@ -52,6 +52,7 @@ controller = {
         id: currentUserId,
         role: "client",
         favoriteProducts: [],
+        cart: [],
       };
 
       const newDocument = await users
@@ -256,6 +257,114 @@ controller = {
 
       res.status(200).json({ isFavorite: isFavorite });
     } catch (error) {
+      res.status(500).json({ message: "Server error: " + error.message });
+    }
+  },
+  getCart: async (req, res) => {
+    console.log("Intram pe ruta get? ");
+    try {
+      const userId = req.user.userId;
+      console.log("userId: " + userId);
+
+      const userDoc = await users.doc(userId.toString()).get();
+      if (!userDoc.exists) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const userData = userDoc.data();
+      const cart = userData.cart || [];
+      const cartQuantity = userData.cartQuantity || [];
+      console.log("cartQuantity: " + cartQuantity);
+      console.log("cart: " + cart);
+
+      res.status(200).json({ cart, cartQuantity });
+    } catch (error) {
+      res.status(500).json({ message: "Server error: " + error.message });
+    }
+  },
+
+  updateCart: async (req, res) => {
+    try {
+      console.log("Am intrat pe ruta 22.00");
+      const userId = req.user.userId;
+      if (!userId) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized: Missing user ID" });
+      }
+
+      const { productId, quantity } = req.body;
+      if (!productId || quantity <= 0) {
+        return res
+          .status(400)
+          .json({ message: "Invalid product ID or quantity" });
+      }
+
+      const userRef = users.doc(userId.toString());
+      const userDoc = await userRef.get();
+
+      if (!userDoc.exists) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      let userData = userDoc.data();
+      let cart = userData.cart || [];
+      let cartQuantity = userData.cartQuantity || [];
+
+      const productIndex = cart.indexOf(productId.toString());
+
+      if (productIndex !== -1) {
+        cartQuantity[productIndex] = quantity;
+      } else {
+        cart.push(productId);
+        cartQuantity.push(quantity);
+      }
+
+      await userRef.update({ cart, cartQuantity });
+
+      res
+        .status(200)
+        .json({ message: "Cart updated successfully", cart, cartQuantity });
+    } catch (error) {
+      res.status(500).json({ message: "Server error: " + error.message });
+    }
+  },
+
+  removeFromCart: async (req, res) => {
+    try {
+      const userId = req.user.userId;
+      const { productId } = req.body;
+
+      const userRef = users.doc(userId.toString());
+      const userDoc = await userRef.get();
+
+      if (!userDoc.exists) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      let cart = userDoc.data().cart || [];
+      let cartQuantity = userDoc.data().cartQuantity || [];
+      let index;
+
+      for (let i of cart) {
+        if (cart[i] == productId) {
+          index = i;
+          break;
+        }
+      }
+      console.log("index:" + index);
+      if (index === -1) {
+        return res.status(404).json({ message: "Product not found in cart" });
+      }
+
+      cart.splice(index, 1);
+      cartQuantity.splice(index, 1);
+
+      await userRef.update({ cart, cartQuantity });
+
+      res.status(200).json({ message: "Product removed from cart" });
+    } catch (error) {
+      console.error("Error removing product:", error);
       res.status(500).json({ message: "Server error: " + error.message });
     }
   },

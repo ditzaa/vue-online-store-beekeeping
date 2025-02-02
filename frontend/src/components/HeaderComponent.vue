@@ -34,12 +34,16 @@ const goToFavorites = () => {
     router.push("/login");
   }
 };
+
+const goToCart = () => {
+  router.push("/cos-cumparaturi");
+};
 </script>
 
 <template>
   <header class="header-container">
     <div class="icons">
-      <ShoppingCart class="icon" :size="32" />
+      <ShoppingCart class="icon" :size="32" @click="goToCart()" />
       <Heart class="icon" id="heart-icon" :size="32" @click="goToFavorites()" />
       <User class="icon" fill="var(--text-color)" :size="32" @click="showLoginModal = true" />
     </div>

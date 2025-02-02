@@ -9,11 +9,6 @@ const { orderController } = require("../controllers");
 
 router.get("/getAllOrders", orderController.getAllOrders);
 router.get("/getOrderById/:id", orderController.getOrderById);
-router.post(
-  "/add",
-  authenticateUser,
-  authorizeRole("admin"),
-  orderController.addOrder
-);
+router.post("/add", orderController.addOrder);
 
 module.exports = router;

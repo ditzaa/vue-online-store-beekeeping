@@ -6,19 +6,23 @@ controller = {
     try {
       const {
         clientName,
+        email,
+        phone,
         county,
         locality,
-        productNames,
-        productAmounts,
+        cart,
+        cartQuantity,
         totalPrice,
       } = req.body;
 
       if (
         !clientName ||
         !county ||
+        !email ||
+        !phone ||
         !locality ||
-        productNames == {} ||
-        productAmounts == {} ||
+        cart == {} ||
+        cartQuantity == {} ||
         totalPrice < 0
       ) {
         return res.status(400).send({ message: "Invalid order data" });
@@ -38,26 +42,27 @@ controller = {
       const status = "In asteptare";
 
       const newOrderData = {
-        id: currentOrderId,
         clientName,
+        email,
+        phone,
         county,
         locality,
-        productNames,
-        productAmounts,
+        cart,
+        cartQuantity,
         totalPrice,
-        status,
       };
 
       const newOrderRef = await orders
         .doc(currentOrderId.toString())
         .set(newOrderData);
-      const savedOrder = await newOrderRef.get();
-      const orderData = savedOrder.data();
+      // const savedOrder = await newOrderRef.get();
+      // const orderData = savedOrder.data();
 
       await orderIdDoc.update({ orderId: currentOrderId + 1 });
 
       res.status(201).send({
-        newOrder: orderData,
+        // newOrder: orderData,
+        message: "Order placed succesfuly.",
       });
     } catch (error) {
       res.status(500).send(error.message);

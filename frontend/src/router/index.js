@@ -72,6 +72,11 @@ const router = createRouter({
       name: "FavoriteProducts",
       component: () => import("../views/FavoritesView.vue"),
     },
+    {
+      path: "/cos-cumparaturi",
+      name: "CartView",
+      component: () => import("../views/CartView.vue"),
+    },
   ],
 });
 

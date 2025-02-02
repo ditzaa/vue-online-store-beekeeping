@@ -81,9 +81,59 @@ const toggleFavorite = async () => {
   }
 };
 
-// const addToCart = () => {
-//   productStore.addToCart(props.product);
-// };
+const addToCart = async () => {
+  if (authStore.isAuthenticated) {
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+    if (!userId) {
+      console.error("User ID not found");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://${import.meta.env.VITE_DOMAIN_NAME}:${
+          import.meta.env.VITE_PORT_BACK_END
+        }/api/user/addToCart`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productId: props.product.id,
+            quantity: 1,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update cart");
+      }
+
+      const data = await response.json();
+      console.log("Cart updated successfully:", data);
+    } catch (error) {
+      console.error("Error updating cart:", error);
+    }
+  } else {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existingItem = cart.find((item) => item.productId === props.product.id);
+    if (existingItem) {
+      existingItem.quantity++;
+    } else {
+      cart.push({
+        productId: props.product.id,
+        quantity: 1,
+        price: props.product.price,
+        name: props.product.name,
+        image: props.product.image,
+      });
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+};
 </script>
 
 <template>

@@ -85,11 +85,11 @@ export const useAuthStore = defineStore("auth", {
       // localStorage.removeItem("role");
       // localStorage.removeItem("userId");
     },
-    // setUserFavorites(favorites) {
-    //   if (this.user) {
-    //     this.user.favoriteProducts = favorites;
-    //     localStorage.setItem("user", JSON.stringify(this.user));
-    //   }
-    // },
+    setUserFavorites(favorites) {
+      if (this.user) {
+        this.user.favoriteProducts = favorites;
+        localStorage.setItem("user", JSON.stringify(this.user));
+      }
+    },
   },
 });

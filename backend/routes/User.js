@@ -19,5 +19,13 @@ router.post("/login", userController.login);
 router.post("/registerAdmin", userController.registerAdmin);
 router.post("/loginAdmin", userController.loginAdmin);
 router.post("/toggleFavorite", authenticateUser, userController.toggleFavorite);
+// cart
+router.get("/getCartProducts", authenticateUser, userController.getCart);
+router.post("/addToCart", authenticateUser, userController.updateCart);
+router.delete(
+  "/removeFromCart",
+  authenticateUser,
+  userController.removeFromCart
+);
 
 module.exports = router;
