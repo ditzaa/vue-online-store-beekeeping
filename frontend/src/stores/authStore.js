@@ -71,6 +71,8 @@ export const useAuthStore = defineStore("auth", {
         console.log("User after validation:", this.user);
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", this.user.name);
+        //   localStorage.removeItem("role", thus);
+        // localStorage.removeItem("userId");
       } catch (error) {
         console.error("Eroare la autentificare:", error.message);
       }
@@ -80,6 +82,14 @@ export const useAuthStore = defineStore("auth", {
       this.user = null;
       localStorage.removeItem("token");
       localStorage.removeItem("username");
+      // localStorage.removeItem("role");
+      // localStorage.removeItem("userId");
     },
+    // setUserFavorites(favorites) {
+    //   if (this.user) {
+    //     this.user.favoriteProducts = favorites;
+    //     localStorage.setItem("user", JSON.stringify(this.user));
+    //   }
+    // },
   },
 });

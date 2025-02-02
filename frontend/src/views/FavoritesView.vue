@@ -7,6 +7,7 @@ import ProductCard from "@/components/ProductCard.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const favoriteProductsIds = ref([]);
 const favoriteProducts = ref([]);
 
 const fetchFavoriteProducts = async () => {
@@ -22,7 +23,18 @@ const fetchFavoriteProducts = async () => {
       }
     );
     const data = await response.json();
-    favoriteProducts.value = data;
+    favoriteProductsIds.value = data;
+    const productPromises = favoriteProductsIds.value.map(async (id) => {
+      const resId = await fetch(
+        `http://${import.meta.env.VITE_DOMAIN_NAME}:${
+          import.meta.env.VITE_PORT_BACK_END
+        }/api/product/getProductById/${id}`
+      );
+      return resId.json();
+    });
+
+    const favoriteProductsArray = await Promise.all(productPromises);
+    favoriteProducts.value.push(...favoriteProductsArray);
   } catch (error) {
     console.error("Error fetching favorite products:", error);
   }

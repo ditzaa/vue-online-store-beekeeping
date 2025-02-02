@@ -3,6 +3,7 @@ const users = db.collection("users");
 const products = db.collection("products");
 const bcrypt = require("bcrypt");
 const generateToken = require("../utils/jwt");
+const { setLogFunction } = require("firebase-admin/firestore");
 require("dotenv").config();
 
 controller = {
@@ -170,28 +171,92 @@ controller = {
         return res.status(401).send({ message: "Invalid password" });
       }
 
+      console.log(user);
       const token = generateToken(user.id, user.role);
       res.status(200).send({ message: "Admin logged in succesfuly", token });
     } catch (error) {
       res.status(500).send({ message: error.message });
     }
   },
-  getFavorites: async (req, res) => async (req, res) => {
+  getFavorites: async (req, res) => {
     try {
-      const userId = req.user.id;
-      const userDoc = await users.doc(userId).get();
+      const userId = req.user.userId;
+      const userDoc = await users.doc(userId.toString()).get();
+
+      if (!userDoc.exists) {
+        return res.status(404).send({ message: "User not found" });
+      }
+
       const user = userDoc.data();
+      const favoriteProducts = user.favoriteProducts;
 
-      const favoriteProducts = await Promise.all(
-        user.favoriteProducts.map(async (productId) => {
-          const productDoc = await products.doc(productId).get();
-          return productDoc.data();
-        })
-      );
-
+      console.log("favorite products" + favoriteProducts);
       res.send(favoriteProducts);
     } catch (error) {
       res.status(500).send({ message: error.message });
+    }
+  },
+  toggleFavorite: async (req, res) => {
+    try {
+      const userId = req.user.userId;
+      const { productId } = req.body;
+
+      if (!userId || !productId) {
+        return res.status(400).json({ message: "Missing userId or productId" });
+      }
+
+      const userRef = db.collection("users").doc(userId.toString());
+      const userDoc = await userRef.get();
+
+      if (!userDoc.exists) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const user = userDoc.data();
+      const favoriteProducts = new Set(user.favoriteProducts || []);
+
+      let isFavorite;
+      if (favoriteProducts.has(productId)) {
+        favoriteProducts.delete(productId);
+        isFavorite = false;
+      } else {
+        favoriteProducts.add(productId);
+        isFavorite = true;
+      }
+
+      await userRef.update({ favoriteProducts: Array.from(favoriteProducts) });
+
+      res.status(200).json({
+        favoriteProducts: Array.from(favoriteProducts),
+        isFavorite: isFavorite,
+      });
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+  getFavoriteStatus: async (req, res) => {
+    try {
+      const { userId } = req.user;
+      const { productId } = req.params;
+
+      const userDoc = await users.doc(userId.toString()).get();
+      if (!userDoc.exists) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const userData = userDoc.data();
+      let isFavorite = false;
+      for (let idIndex of userData.favoriteProducts) {
+        if (idIndex == productId) {
+          isFavorite = true;
+          break;
+        }
+      }
+
+      res.status(200).json({ isFavorite: isFavorite });
+    } catch (error) {
+      res.status(500).json({ message: "Server error: " + error.message });
     }
   },
 };

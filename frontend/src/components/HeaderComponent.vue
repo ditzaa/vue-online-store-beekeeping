@@ -40,7 +40,7 @@ const goToFavorites = () => {
   <header class="header-container">
     <div class="icons">
       <ShoppingCart class="icon" :size="32" />
-      <Heart class="icon" id="heart-icon" :size="32" />
+      <Heart class="icon" id="heart-icon" :size="32" @click="goToFavorites()" />
       <User class="icon" fill="var(--text-color)" :size="32" @click="showLoginModal = true" />
     </div>
     <h1 class="title">The Bee's Store 🐝</h1>

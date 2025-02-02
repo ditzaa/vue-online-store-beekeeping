@@ -2,23 +2,13 @@
 import { Heart } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
-import { computed } from "vue";
-
+import { ref, computed, watch, onMounted } from "vue";
 // import { useProductStore } from "@/stores/productStore";
+
 // const productStore = useProductStore();
 const router = useRouter();
 const authStore = useAuthStore();
-
-const isFavorite = computed(() => {
-  return authStore.user?.favoriteProducts?.includes(props.product.id);
-});
-
-const toggleFavorite = () => {
-  if (!authStore.isAuthenticated) {
-    router.push("/login");
-    return;
-  }
-};
+const isFavorite = ref(false);
 
 const props = defineProps({
   product: {
@@ -31,31 +21,79 @@ const goToProductDetails = () => {
   router.push(`/product/${props.product.id}`);
 };
 
-// const addToFavorites = () => {
-//   productStore.addToFavorites(props.product);
-// };
+const fetchFavoriteStatus = async () => {
+  if (!authStore.isAuthenticated) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      `http://${import.meta.env.VITE_DOMAIN_NAME}:${
+        import.meta.env.VITE_PORT_BACK_END
+      }/api/user/favorites/${props.product.id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch favorite status");
+
+    const data = await response.json();
+    isFavorite.value = data.isFavorite;
+  } catch (error) {
+    console.error("Error fetching favorite status:", error);
+  }
+};
+
+onMounted(fetchFavoriteStatus);
+
+const toggleFavorite = async () => {
+  if (!authStore.isAuthenticated) {
+    router.push("/login");
+    return;
+  }
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      `http://${import.meta.env.VITE_DOMAIN_NAME}:${
+        import.meta.env.VITE_PORT_BACK_END
+      }/api/user/toggleFavorite`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId: props.product.id }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update favorites");
+    }
+
+    const data = await response.json();
+    authStore.setUserFavorites(data.favoriteProducts); // Actualizează Pinia store
+    isFavorite.value = data.isFavorite;
+    isFavorite.value = data.favoriteProducts.includes(props.product.id);
+  } catch (error) {
+    console.error("Error toggling favorite:", error);
+  }
+};
 
 // const addToCart = () => {
 //   productStore.addToCart(props.product);
 // };
 </script>
 
-<!-- <template>
-  <div class="product-card" @click="goToProductDetails">
-    <img :src="product.image" :alt="product.name" class="product-image" />
-    <img src="../assets/borcan-miere-poliflora.jpg" alt="product.name" class="product-image" />
-    <h3 class="product-name">{{ product.name }}</h3>
-    <p class="product-price">{{ product.price }} Lei</p>
-    <div class="product-buttons">
-      <Heart @click.stop="addToFavorites" class="favorite-button" />
-      <button @click.stop="addToCart" class="add-cart-button">🛒 Adaugă în coș</button>
-    </div>
-  </div>
-</template> -->
-
 <template>
   <div class="product-card">
-    <img :src="product.image" :alt="product.name" class="product-image" />
+    <img
+      :src="product.image"
+      :alt="product.name"
+      class="product-image"
+      @click="goToProductDetails"
+    />
     <h3 class="product-name">{{ product.name }}</h3>
     <p class="product-price">{{ product.price }} Lei</p>
     <div class="product-buttons">
