@@ -1,5 +1,13 @@
 <script setup>
-import { Heart, Search, ShoppingCart, User } from "lucide-vue-next";
+import { useRouter } from "vue-router";
+import { Search } from "lucide-vue-next";
+
+const router = useRouter();
+
+const logout = () => {
+  localStorage.clear();
+  router.push("/admin/login");
+};
 </script>
 
 <template>
@@ -11,6 +19,7 @@ import { Heart, Search, ShoppingCart, User } from "lucide-vue-next";
         <li><RouterLink class="links" to="/admin/comenzi">Comenzi</RouterLink></li>
         <li><RouterLink class="links" to="/produse/miere">Produse</RouterLink></li>
         <li><RouterLink class="links" to="/produse/altele">Statistici</RouterLink></li>
+        <li><a class="links" href="#" @click.prevent="logout">Delogare</a></li>
       </ul>
     </nav>
     <div class="search-bar">

@@ -140,7 +140,6 @@ controller = {
         .doc(currentUserId.toString())
         .set(newAdmin);
       await userIdDoc.update({ userId: currentUserId + 1 });
-
       res.status(201).send({
         message: "Admin registered successfully",
         newAdmin: newAdmin,
@@ -151,11 +150,11 @@ controller = {
   },
   loginAdmin: async (req, res) => {
     try {
-      const { email, password } = req.body;
-      if (!email || !password) {
+      const { email, password, adminPass } = req.body;
+      if (!email || !password || !adminPass) {
         return res
           .status(400)
-          .send({ message: "Email and password are required" });
+          .send({ message: "Email, password and admin password are required" });
       }
 
       const userQuery = await users.where("email", "==", email).get();
@@ -172,7 +171,10 @@ controller = {
         return res.status(401).send({ message: "Invalid password" });
       }
 
-      console.log(user);
+      if (adminPass !== process.env.ADMIN_PASS) {
+        return res.status(401).send({ message: "Invalid admin password" });
+      }
+
       const token = generateToken(user.id, user.role);
       res.status(200).send({ message: "Admin logged in succesfuly", token });
     } catch (error) {
