@@ -82,6 +82,12 @@ const router = createRouter({
       name: "Checkout",
       component: () => import("../views/CheckoutView.vue"),
     },
+    {
+      path: "/admin/comenzi/:id",
+      name: "OrderDetails",
+      component: () => import("@/views/OrderDetailsView.vue"),
+      props: true,
+    },
   ],
 });
 

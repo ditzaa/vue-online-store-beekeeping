@@ -81,11 +81,13 @@ controller = {
       snapshot.forEach((doc) => {
         ordersArray.push({
           id: doc.id,
+          email: doc.data().email,
+          phone: doc.data().phone,
           clientName: doc.data().clientName,
           county: doc.data().county,
           locality: doc.data().locality,
-          productNames: doc.data().productNames,
-          productAmounts: doc.data().productAmounts,
+          cart: doc.data().cart,
+          cartQuantitiy: doc.data().cartQuantity,
           status: doc.data().status,
           totalPrice: doc.data().totalPrice,
         });
@@ -109,6 +111,31 @@ controller = {
 
       const orderData = orderDoc.data();
       res.status(200).send(orderData);
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+  },
+  updateOrder: async (req, res) => {
+    try {
+      const orderId = req.params.id;
+      const { status } = req.body;
+      console.log("Stat: " + status);
+      console.log("Order:" + orderId);
+
+      if (!status) {
+        return res.status(400).json({ error: "Status not received" });
+      }
+
+      const orderRef = orders.doc(orderId.toString());
+      const orderSnapshot = await orderRef.get();
+
+      if (!orderSnapshot.exists) {
+        return res.status(404).json({ error: "Comanda nu există" });
+      }
+
+      await orderRef.update({ status });
+
+      res.status(200).send({ message: "Order updated succesfuly" });
     } catch (error) {
       res.status(400).send(error.message);
     }

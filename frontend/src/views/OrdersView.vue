@@ -1,37 +1,40 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import AdminHeader from "@/components/AdminHeader.vue";
 
-// mock-uri
-const orders = ref([
-  { id: 1, total: 250.0, status: "În așteptare" },
-  { id: 2, total: 100.0, status: "Expediată" },
-  { id: 3, total: 300.0, status: "Livrată" },
-  { id: 4, total: 300.0, status: "Expediată" },
-  { id: 5, total: 300.0, status: "Livrată" },
-  { id: 6, total: 300.0, status: "Livrată" },
-]);
+const orders = ref([]);
+const filteredOrders = ref([]);
+const loading = ref(true);
+const errorMessage = ref("");
 
-const filteredOrders = ref([...orders.value]);
+const fetchOrdersFromBackend = async () => {
+  try {
+    const response = await fetch(
+      `http://${import.meta.env.VITE_DOMAIN_NAME}:${
+        import.meta.env.VITE_PORT_BACK_END
+      }/api/order/getAllOrders`
+    );
+    if (!response.ok) throw new Error("Eroare la preluarea comenzilor");
+
+    const data = await response.json();
+    orders.value = data;
+    filteredOrders.value = data;
+  } catch (error) {
+    errorMessage.value = error.message;
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(fetchOrdersFromBackend);
+
 const filterByStatus = (status) => {
-  if (status == "Toate") {
+  if (status === "Toate") {
     filteredOrders.value = [...orders.value];
   } else {
     filteredOrders.value = orders.value.filter((order) => order.status === status);
   }
 };
-
-// TODO: implement back-end route
-// const fetchOrdersFromBackend = async () => {
-//   try {
-//     const response = await fetch("/api/orders");
-//     const data = await response.json();
-//     orders.value = data;
-//     filteredOrders.value = data;
-//   } catch (error) {
-//     console.error("Eroare la preluarea comenzilor:", error);
-//   }
-// };
 </script>
 
 <template>
@@ -40,19 +43,31 @@ const filterByStatus = (status) => {
     <section class="orders-view">
       <h1>Comenzi</h1>
 
-      <div class="filter-buttons">
-        <button @click="filterByStatus('Toate')">Toate</button>
-        <button @click="filterByStatus('În așteptare')">În așteptare</button>
-        <button @click="filterByStatus('Expediată')">Expediate</button>
-        <button @click="filterByStatus('Livrată')">Livrate</button>
-      </div>
+      <div v-if="loading">Se încarcă...</div>
+      <div v-else-if="errorMessage" class="error">{{ errorMessage }}</div>
+      <div v-else>
+        <div class="filter-buttons">
+          <button @click="filterByStatus('Toate')">Toate</button>
+          <button @click="filterByStatus('In asteptare')">În așteptare</button>
+          <button @click="filterByStatus('Expediata')">Expediate</button>
+          <button @click="filterByStatus('Livrata')">Livrate</button>
+        </div>
 
-      <div class="order-list">
-        <div class="order-item" v-for="order in filteredOrders" :key="order.id">
-          <div>ID comandă: {{ order.id }}</div>
-          <div>Preț total: {{ order.total }} Lei</div>
-          <div>Status: {{ order.status }}</div>
-          <button class="view-button">Vizualizare</button>
+        <div class="order-list">
+          <div class="order-item" v-for="order in filteredOrders" :key="order.id">
+            <div><b>ID comandă:</b> {{ order.id }}</div>
+            <div><b>Client:</b> {{ order.clientName }}</div>
+            <div><b>Email: </b>{{ order.email }}</div>
+            <div><b>Telefon:</b> {{ order.phone }}</div>
+            <div><b>Pret total:</b> {{ order.totalPrice }} Lei</div>
+            <div><b>Status:</b> {{ order.status }}</div>
+            <router-link
+              :to="{ name: 'OrderDetails', params: { id: order.id } }"
+              class="view-button"
+            >
+              Vizualizare
+            </router-link>
+          </div>
         </div>
       </div>
     </section>
@@ -62,25 +77,34 @@ const filterByStatus = (status) => {
 <style scoped>
 .orders-container {
   background-color: var(--background-color);
-  height: 46rem;
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
 }
+
 .orders-view {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: flex-start;
-  padding-top: 20px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+h1 {
+  text-align: center;
 }
 
 .filter-buttons {
-  /* justify-self: flex-start; */
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .filter-buttons button {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   background-color: var(--primary-color);
   color: var(--text-color);
   border: none;
@@ -98,51 +122,71 @@ const filterByStatus = (status) => {
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
-  max-width: 800px;
 }
 
 .order-item {
   display: flex;
-  justify-content: space-between;
-  padding: 1rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
   border: 1px solid var(--secondary-color);
-  border-radius: 8px;
+  border-radius: 10px;
   background-color: var(--card-bg);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin: auto;
+  width: 300px;
+  height: 250px;
+}
+
+.order-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.order-item div {
+  font-size: 1rem;
+  color: var(--text-color);
 }
 
 .view-button {
   background-color: var(--primary-color);
   color: var(--text-color);
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  text-align: center;
+  text-decoration: none;
 }
 
 .view-button:hover {
   background-color: var(--secondary-color);
 }
 
-@media (min-width: 768px) and (max-width: 1200px) {
-  .orders-view {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-  }
+.error {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
 }
 
 @media (max-width: 768px) {
   .filter-buttons {
-    /* flex-wrap: wrap; */
     flex-direction: column;
+    align-items: center;
   }
 
-  .filter-buttons > button {
-    width: 180px;
-    height: 50px;
+  .filter-buttons button {
+    width: 100%;
+    max-width: 200px;
     font-weight: bold;
     margin-bottom: 10px;
+  }
+
+  .order-item {
+    padding: 1.25rem;
   }
 }
 </style>

@@ -3,6 +3,7 @@ const users = db.collection("users");
 const products = db.collection("products");
 const bcrypt = require("bcrypt");
 const generateToken = require("../utils/jwt");
+const { generateAdminToken } = require("../utils/jwt");
 const { setLogFunction } = require("firebase-admin/firestore");
 require("dotenv").config();
 
@@ -175,8 +176,13 @@ controller = {
         return res.status(401).send({ message: "Invalid admin password" });
       }
 
-      const token = generateToken(user.id, user.role);
-      res.status(200).send({ message: "Admin logged in succesfuly", token });
+      const token = generateAdminToken(user.id, user.role);
+      console.log("Token-ul se genereaza aici, rol: " + user.role);
+      res.status(200).send({
+        message: "Admin logged in succesfuly",
+        token,
+        userRole: user.role,
+      });
     } catch (error) {
       res.status(500).send({ message: error.message });
     }

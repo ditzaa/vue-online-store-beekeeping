@@ -37,4 +37,37 @@ const authorizeRole = (role) => {
   };
 };
 
-module.exports = { authenticateUser, authorizeRole };
+const verifyAdminToken = (req, res, next) => {
+  console.log("Middleware de autentificare admin apelat.");
+  const adminToken = req.header("Authorization");
+  console.log("token:" + adminToken);
+  if (!adminToken) {
+    return res
+      .status(401)
+      .send({ message: "Acces denied, no token provided." });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      adminToken.replace("Bearer ", ""),
+      process.env.JWT_SECRET
+    );
+
+    req.user = decoded;
+    // console.log("decoded" + req.user);
+    console.log("user id: " + req.user.userId);
+    console.log("user role: " + req.user.role);
+
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Denied acces, request made by a not-admin." });
+    }
+
+    next();
+  } catch (error) {
+    res.status(400).send({ message: "Invalid token" });
+  }
+};
+
+module.exports = { authenticateUser, authorizeRole, verifyAdminToken };

@@ -7,4 +7,10 @@ const generateToken = (userId) => {
   });
 };
 
-module.exports = generateToken;
+const generateAdminToken = (userId, role) => {
+  return jwt.sign({ userId, role }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+module.exports = { generateToken, generateAdminToken };
