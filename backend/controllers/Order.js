@@ -13,6 +13,7 @@ controller = {
         cart,
         cartQuantity,
         totalPrice,
+        deliveryMethod,
       } = req.body;
 
       if (
@@ -21,8 +22,10 @@ controller = {
         !email ||
         !phone ||
         !locality ||
-        cart == {} ||
-        cartQuantity == {} ||
+        !deliveryMethod ||
+        !cart ||
+        !cartQuantity ||
+        totalPrice === undefined ||
         totalPrice < 0
       ) {
         return res.status(400).send({ message: "Invalid order data" });
@@ -30,6 +33,7 @@ controller = {
 
       const orderIdDoc = orders.doc("orderIdIndex");
       const orderIdSnapshot = await orderIdDoc.get();
+
       if (!orderIdSnapshot.exists) {
         return res
           .status(500)
@@ -50,22 +54,20 @@ controller = {
         cart,
         cartQuantity,
         totalPrice,
+        deliveryMethod,
+        status,
       };
 
-      const newOrderRef = await orders
-        .doc(currentOrderId.toString())
-        .set(newOrderData);
-      // const savedOrder = await newOrderRef.get();
-      // const orderData = savedOrder.data();
-
+      await orders.doc(currentOrderId.toString()).set(newOrderData);
       await orderIdDoc.update({ orderId: currentOrderId + 1 });
 
       res.status(201).send({
-        // newOrder: orderData,
-        message: "Order placed succesfuly.",
+        message: "Order placed successfully.",
       });
     } catch (error) {
-      res.status(500).send(error.message);
+      res
+        .status(500)
+        .send({ message: "Internal Server Error", error: error.message });
     }
   },
   getAllOrders: async (req, res) => {

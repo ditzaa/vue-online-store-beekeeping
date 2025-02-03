@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { useAuthStore } from "@/stores/authStore";
+import { useAuthStore } from "../stores/authStore";
+import { useRouter } from "vue-router";
 import HeaderComponent from "@/components/HeaderComponent.vue";
-
+const router = useRouter();
 const authStore = useAuthStore();
 const cartRef = ref([]);
 const nbOfDifferentProducts = ref(0);
@@ -132,6 +133,19 @@ const updateQuantity = async (productId, newQuantity) => {
 const totalPrice = computed(() =>
   cartRef.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
 );
+
+const goToCheckout = () => {
+  localStorage.setItem("cart", JSON.stringify(cartRef.value));
+  localStorage.setItem("totalPrice", JSON.stringify(totalPrice.value));
+
+  router.push({
+    path: "/checkout",
+    query: {
+      cart: JSON.stringify(cartRef.value),
+      totalPrice: totalPrice.value,
+    },
+  });
+};
 
 onMounted(fetchCart);
 </script>

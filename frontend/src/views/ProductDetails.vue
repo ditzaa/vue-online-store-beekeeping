@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { Heart } from "lucide-vue-next";
 import HeaderComponent from "@/components/HeaderComponent.vue";
+import ProductCard from "@/components/ProductCard.vue";
 
 const route = useRoute();
 const product = ref(null);
@@ -27,13 +28,7 @@ onMounted(fetchProductDetails);
   <div>
     <HeaderComponent />
     <div v-if="product" class="product-details">
-      <h2 class="product-title">{{ product.name }}</h2>
-      <img :src="product.image" :alt="product.name" class="product-image" />
-      <p class="product-price">{{ product.price }} Lei</p>
-      <div class="product-buttons">
-        <Heart class="favorite-product" />
-        <button class="add-cart-button">🛒 Adaugă în coș</button>
-      </div>
+      <ProductCard :key="product.id" :product="product" />
       <h3>Descriere produs</h3>
       <p>{{ product.description }}</p>
     </div>
