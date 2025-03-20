@@ -11,10 +11,10 @@ Clients can:
 - save products to a favorites list (for logged-in users)
 
 Admins can:
-- create accounts
+- register and authenticate using a JWT token
 - add, update and remove products (including quantities and images)
 - Update the status of orders
-- 
+
 
 ## Clone the repository
 ```
