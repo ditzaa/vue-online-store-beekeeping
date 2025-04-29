@@ -47,7 +47,7 @@ Make sure you have the lastest Node.js version installed on your machine. You al
 If you’d like to contribute, follow these steps:
 
 1. Fork the repository.
-2. Create a new branch (git checkout -b feature-branch).
+2. Create a new branch (git checkout -b <feature-branch>).
 3. Make your changes and commit them (git commit -m 'Add new feature').
 4. Push the branch (git push origin feature-branch).
 5. Open a pull request.
